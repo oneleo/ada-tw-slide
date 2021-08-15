@@ -1,0 +1,588 @@
+Cardano ADA 臺灣研究社
+Cardano 區塊鏈的基本介紹
+19:40 09 Aug 2018
+Tags: Cardano, ADA, Daedalus, Ouroboros
+
+陳敬翔 Irara
+中華電信, IaaS 服務專員
+oneleo@cht.com.tw
+https://www.facebook.com/oneleo760823
+@oneleo760823
+
+# --------------------------------------------------
+
+* 緣由
+
+- 專門研究區塊鏈的學術單位可能也沒聽過 Cardano。
+
+- 因為 Cardano 的內容博大精深，所以某些較深入的內容我也仍在學習中，若有高手願意的話也可來一起討論。
+
+- 本投影片最後有放非常多參考資料，可當作是區塊鏈大補帖。
+
+- 最後因為時間上的關係，有幾頁會 1 秒帶過，有相關問題可事後來問我。
+
+- → → → 那我們就開始吧！
+
+# --------------------------------------------------
+
+* 大綱
+
+- 什麼是 Cardano - 簡介、團隊、架構及特性
+
+- Cardano 虛擬機及測試網路
+
+- Cardano 共識算法
+
+- Cardano 錢包
+
+- 如何買 Cardano ADA
+
+- 相關學習資源（豐富）
+
+# --------------------------------------------------
+
+* 什麼是 Cardano？
+
+# --------------------------------------------------
+
+* 來看看希多大神對 Cardano 的說明
+
+- 是從 2015 年 10 月發行的項目，並於 2017 年 9 月公開販售。
+- 完全開源。（[[https://github.com/input-output-hk/cardano-sl/][Github]]）
+- 由研究為主導，嚴格採數學方法證明安全的區塊鏈。堅持通過[[https://www.cardano.org/zh/cardano-audit-reports-2/][同行評審]]再開發。
+- 目標是建構全新分層次的區塊鏈生態系統，直接競爭對手即為比特幣、以太坊。
+- 開發成員由一群國際化的工程師和科學家組成。
+
+.image ./images/i20180809/BitWhale.png 240 450
+
+- 參考：Youtube - 希多說幣 - [[https://youtu.be/cdLGjVTKlQc][Cardano—世界第一個經過數理驗證的區塊鏈]]
+#- （轉自）Steemit：希多說幣 - [[https://steemkr.com/cn/@mreko/cardano-what-is-cardano][Cardano—世界第一個經過數理驗證的區塊鏈]]
+
+#- http://www.xiaob.org/article/364
+#- https://whycardano.com/cn/
+
+# --------------------------------------------------
+
+* Cardano 執行長 - Charles Hoskinson
+
+- 查爾斯 Charles 也曾為以太彷經典 CEO，參與過以太坊、BitShare 開發。使得他在區塊鏈領域有著非常豐富的實戰經驗。
+- 和以太坊創辦人 V 神 Vitalik、BitShare 創始人 BM 有著緊密關係。
+- 與英國 Edinburgh 大學、美國的 Illinois 及 Stanford 大學保持著緊密合作。
+
+.image ./images/i20180809/CEO.png 350 705
+
+# --------------------------------------------------
+
+#* Cardano 三大團隊
+
+#- 【Cardano 基金會】- 負責標準制定及支援 Cardano 社區。
+#- 【IOHK 公司】- 負責 Cardano 研究及開發。擁有頂尖的 Haskell 成員。
+#- 【Emurgo 投資公司】- 協助 Cardano 相關企業建立區塊鏈應用。
+
+#- Cardano 核心成員超過 50 位以上。Haskell 創始人 Philip Wadler 教授也來協助開發。
+
+#.image ./images/i20180809/Foundation_Iohk_Emurgo.png 350 600
+
+# https://steemkr.com/cn/@htliao/cardano
+# https://itw01.com/G2INE62.html
+# https://cardanofoundation.org/cn/press/cardano-a-blockchain-with-privacy-and-regulation/
+# https://www.theedwin.me/single-post/2018/03/07/%E3%80%90%E5%B0%8F%E8%B5%84%E6%8E%A8%E8%8D%90%E3%80%91%E5%8A%A0%E5%AF%86%E8%B4%A7%E5%B8%81-Project-Cardano-ADA
+
+# --------------------------------------------------
+
+* Cardano 程式碼特性
+
+- 核心開發語言 [[https://zh.wikipedia.org/wiki/Haskell][Haskell]] 不同於一般語言，它為純函數程式語言，學習門檻稍高。
+- 因其強型別、不可變的數據結構而有著[[https://www.zhihu.com/question/279186206][高安全度]]。
+- 可以極大化的避免因為漏洞導致被駭客入侵的風險。
+
+.image ./images/i20180809/Haskell.png 419 400
+
+# --------------------------------------------------
+
+* Cardano 的雙層式架構
+
+- 為了解決比特幣及以太坊協議更新需硬分岔一途，可採投票的方式來進行決議
+- 1、清算層 Settlement Layer：目前已開發完成，Cardano 代幣 ADA 在此層流動。
+- 2、運算層 Compute Layer：將在此層提供智慧合約、身份認證、訊息通訊等功能。
+- 主要有：抵抗量子攻擊演算法、未來可使用 Ledger Nano S 硬體錢包、KEVM／IELE 虛擬機、Delegated Proof of Stake（DPOS）共識算法、Daedalus 軟體錢包。
+
+.image ./images/i20180809/MultiLayer.PNG 230 500
+
+- 註：目前已知 Tezos、Decred 也具備投票機制，也是為了有效解決硬分岔議題。
+
+# --------------------------------------------------
+
+* Cardano 可抵抗量子演算法
+
+- Cardano 使用 BLISS 抵抗量子攻擊簽名方案。
+- 使得未來就算量子電腦發展（窮舉時除數、被除數可塞多個變數）已到能破壞橢圓曲線加密技術，仍可防止資金被竊。
+
+.image ./images/i20180809/GoogleQtum.png 374 725
+
+- 註：目前已知 NEO、IOTA 也具備抵抗量子攻擊能力。
+
+#- https://www.weibo.com/ttarticle/p/show?id=2309404198590464551326
+#- https://media.weibo.cn/article?object_id=1022%3A2309404199058272083733&url_type=39&object_type=article&pos=1&luicode=10000011&lfid=1076031909027022&id=2309404199058272083733&ep=FFyXpkcJA,1909027022,FFyXpkcJA,1909027022
+
+#- https://www.facebook.com/ssuhan.chen.5/videos/1830045347008616/?hc_ref=ARS4okaC_Es3bVRB42DE-l2nEjMfh62silIOGzUYPcVo-pDXjY1gtitXWoagINJcfp8
+#- https://zhuanlan.zhihu.com/p/33776634
+#- https://cloud.tencent.com/developer/article/1015123
+
+# --------------------------------------------------
+
+* 未來可使用 Ledger Nano S 硬體錢包
+
+- 將私鑰（密碼）和網路隔離。
+- 提領加密貨幣時需按下實體按鈕才能進行。
+- 故障可使用全新的 Ledger 錢包 + 24 組助憶詞復原。
+
+.image ./images/i20180809/LedgerWallet.png 397 750
+
+# --------------------------------------------------
+
+* KEVM、IELE 虛擬機及測試網路（1／3）
+
+- 在以太坊上使用 Solidity 語言所開發的 DAPPs 可平行轉移至 Cardano 內執行。
+
+.image ./images/i20180809/IELE_VM.png 459 750
+
+# --------------------------------------------------
+
+* KEVM、IELE 虛擬機及測試網路（2／3）
+- 官方 2018/5/28 開放的第一個智能合約測試網路為【KEVM】TestNets（[[https://testnet.iohkdev.io/goguen/kevm/][點此下載]]）
+- 官方 2018/7/30 開放的第二個智能合約測試網路為【IELE】TestNets（[[https://testnet.iohkdev.io/goguen/iele/][點此下載]]）
+- KEVM 測網使用 Solidity 語言來撰寫智能合約（Solidity-to-EVM 編譯較不推薦）
+- IELE 測網可用 Solidity、Plutus、Java、Python 等語言（IELE-to-IELE 編譯較安全）。
+.image ./images/i20180809/SmartContracts.jpg 350 704
+
+# --------------------------------------------------
+
+* KEVM、IELE 虛擬機及測試網路（3／3）
+
+- 官方建議使用 [[https://cardanodocs.com/technical/plutus/introduction/cn/][Plutus]]（Haskell-Like）、Java、Python 等高階語言撰寫，再用 IELE-to-IELE 編譯是較優的。（且變數可為任意長度，不會有溢位漏洞）
+
+- 未來亦可使用視覺化介面 [[https://input-output-hk.github.io/scdsl/][Marlowe]] 來撰寫 Cardano 智能合約。
+
+.image ./images/i20180809/Marlowe.PNG 431 950
+
+# --------------------------------------------------
+
+* 科普時間：為什麼我們需要區塊鏈？（1／4）
+
+- 【中心化】
+- 把錢借人，他掉錢就賴帳 → 我就找德高望重的長老來記所有人的帳！但是：
+- 1、長老年邁已高，萬一有三長兩短！？
+- 2、最近有小偷出現，偷了長老帳簿！？
+- 3、長老愛財如命，每次找他記帳他都要收取手續費，且一年比一年高！？
+- 4、長老做生意謀利，把我們錢借給別人，萬一我們都找他要錢！？
+- 5、長老掌握所有人的個資，萬一他把我們賣了！？
+- 6、長老速度慢，轉個錢要好幾天！？
+- 7、長老生病時，連個人都找不到！？
+
+.image ./images/i20180809/Bank.png 144 300
+#120 250
+
+# --------------------------------------------------
+
+* 科普時間：為什麼我們需要區塊鏈？（2／4）
+
+- 【去中心化】（去中介化、非中心化）不需要透過長老來進行
+- 1、有人進行交易時，就透過大喇叭讓所有人記下這筆帳。
+- 2、不過，使用者付費，使用者仍應支付合理手續費。
+- 3、需要有公平的方法來分享這份手續費！
+
+.image ./images/i20180809/Accounting.png 353 600
+
+- 參考：狼爸爸工作室 - [[https://youtu.be/Oe7fzDrIKt4][什麼是 區塊鏈？什麼是 去中心化？]]
+
+# --------------------------------------------------
+
+* 科普時間：為什麼我們需要區塊鏈？（3／4）
+
+- 所有的交易會透過大喇叭（廣播）和網路上的所有人（節點）說。
+- 每隔一段時間（如 15 秒）會進行造鑰匙大賽（PoW）。最先造出符合鑰匙的人，可打包交易紀錄成區塊，並獲此區內的手續費，最後會把這好消息廣播給所有人知道。
+- 而系統會根據鑰匙、紀錄、記帳者再產生獨一無二的鑰匙孔。整個則稱區塊鏈。
+
+.image ./images/i20180809/BlockChain.png 359 800
+
+# --------------------------------------------------
+
+* 科普時間：為什麼我們需要區塊鏈？（4／4）
+
+- 但是，可能會因網路延遲，在收到別人已造完鑰匙的訊息前，自己也造出了鑰匙。
+- 所以，大家就約定成俗，只承認網路上「最長」的那條鏈，才是正確的。
+- 如此，就算有人故意假造帳目（鑰匙孔不同會斷鏈），大家也不會承認他造的區塊。
+
+.image ./images/i20180809/BlockChains.png 242 1000
+
+# --------------------------------------------------
+
+* 什麼是共識演算法：為了公平的收取記帳的手續費（1／6）
+
+- 方法 1：Proof of Work（POW）算力共識演算法：透過不斷窮舉 Hash(N) 值，最先找到 N 的人可取得此區塊的記帳權，及此區塊內的所有手續費。理論上計帳者的選定是完全公平的，而算力越高越易取得計帳權（但同時也較損耗電力資源）。
+
+#- 方法 1：Proof of Work（POW）算力共識演算法（[[https://zh.wikipedia.org/wiki/%E5%B7%A5%E4%BD%9C%E9%87%8F%E8%AD%89%E6%98%8E][維基百科]]）：
+#- 1、比賽造鑰匙，可想作所有人把顯示卡（算力）擺出來。
+#- 2、接著隔段時間進行隨機抽籤，抽到的人可得記帳權，及獲取此區塊內的手續費。
+#- 3、但是顯示卡的成本、及運作時只為了抽籤的耗電量，其實非常不環保。
+
+.image ./images/i20180809/PoW.png 391 575
+#.image ./images/i20180809/POW_POS.png 254 500
+
+# --------------------------------------------------
+
+* 什麼是共識演算法：為了公平的收取記帳的手續費（2／6）
+
+- 題外話：什麼是 51% 攻擊？
+
+- 1、當某一個人擁有了超過整個網路的 51% 的算力；
+- 2、他將會有較高的機率抽到他來取得記帳權；
+- 3、所以他可以竄改帳目，並且讓所有人承認（因為他造的是最長鏈）。
+
+.image ./images/i20180809/PoWEvil.png 347 700
+
+# --------------------------------------------------
+
+* 什麼是共識演算法：為了公平的收取記帳的手續費（3／6）
+
+- 題外話：什麼是 51% 攻擊？
+- 1、所以真正安全的區塊鏈，參與人數一定要足夠多。
+- 2、且算力要足夠均勻、分散，不能有某人擁超過 51% 算力的情況。
+- 3、也可搭其他解法，如延長出塊時間，讓攻擊成本上升（因算力非常昂貴）。
+- 4、可從[[https://www.crypto51.app/][這個網站]]得知 PoW 共識的區塊鏈若要進行 51% 的攻擊成本。
+- 5、如此，我們就可以保證區塊鏈技術將比中心化的銀行來得安全。
+
+.image ./images/i20180809/BlockChainsEvil.png 278 800
+
+# --------------------------------------------------
+
+* 什麼是共識演算法：為了公平的收取記帳的手續費（4／6）
+
+- 方法 2：Proof of Stake（POS）在均勻機率分配下，根據手持代幣數來取得記帳權，及此區塊內的所有手續費。有些區塊鏈需要擁有足夠的代幣量才能有參與權。理論上計帳者的選定是完全公平的，而代幣持有越多者越易取得記帳權（但不能關機）。
+
+#- 方法 2：Proof of Stake（POS）股權共識算法（[[https://zh.wikipedia.org/wiki/%E6%8C%81%E6%9C%89%E9%87%8F%E8%AD%89%E6%98%8E][維基百科]]）：
+#- 1、把原先用顯示卡造鑰匙的機制，改為所有人把持有加密貨幣（幣權）擺出來。
+#- 2、一樣，隔段時間進行隨機抽籤，抽到的人可得記帳權，及獲取此區塊內的手續費。
+#- 3、雖大幅降低顯卡成本、耗電，但參與者仍需將電腦 24 小時開機運作。
+#- 4、若想要進行 51% 攻擊，則沒收全部代表抽籤的加密貨幣，以保證其安全。
+
+.image ./images/i20180809/PoS.png 338 475
+#.image ./images/i20180809/POW_POS.png 254 500
+
+#- https://forum.cardano.org/t/3-2-emurgo-live-stream/8969
+#- https://www.facebook.com/groups/ada.tw/permalink/2038505419730576/
+#- http://blog.csdn.net/omnispace/article/details/79328095
+#- http://blog.csdn.net/omnispace/article/details/79326108
+
+# --------------------------------------------------
+
+* 什麼是共識演算法：為了公平的收取記帳的手續費（5／6）
+
+- 方法 3：Cardano Ouroboros 第一個學術界證明安全健壯的 Delegated POS 算法。
+
+- 委任表示既可以直接參與投票，也可以委派任何一個代表人幫你投，甚至委派人也可以委派其他人投票。而 Cardano 的 DPOS 委任分為重量級委任及輕量級委任。
+
+- 【重量級委任】需擁有 ADA 總量的 0.03% → 45,000,000,000 ADA * 0.03% = 13,500,000 ADA 才具資格，且可參與 Cardano 運算層 Compute Layer 的更新投票。【輕量級委任】僅能參與產生區塊而已。
+
+.image ./images/i20180809/DPOS.jpg 128 175
+
+- 參考：[[https://zhuanlan.zhihu.com/p/33875952][Cardano(ADA)的財務系統是什麼？]]、[[https://cardanodocs.com/technical/delegation/cn/][卡爾達諾結算層股權委派]]
+- 註：為防止 DDoS 攻擊，ADA 交易上仍需支付一筆較低廉的手續費。
+- 參考：[[https://cardanodocs.com/cardano/transaction-fees/cn/][卡爾達諾結算層的轉賬費用]]
+
+# --------------------------------------------------
+
+* 什麼是共識演算法：為了公平的收取記帳的手續費（6／6）
+
+- 簡單來說 Cardano Ouroboros 委任股權共識算法：
+- 1、如同 PoS 一樣，會進行抽籤，抽中可記帳，但電腦仍需 24 小時不關機。
+- 2、但您可以委託他人，請他幫您進行抽籤，而對方取得的手續費會依比例分給自己。
+
+.image ./images/i20180809/OuroborosDPoS.png 418 900
+
+# --------------------------------------------------
+
+* Cardano 目前仍積極被推廣至各國（1／3）
+
+- CEO 查爾斯 Charles 認為除了要讓 Cardano 擁有正式規範及足夠的驗證外，下一步要花費相當多的時間及精力在教育用戶，如：正確使用客戶端軟體、認知區塊鏈是安全的。目前除日本、歐洲、美國外，更在非洲、以色列等國積極推廣 Cardano 區塊鏈。
+
+- CEO 查爾斯 Charles 很欣賞 Ripple，在採訪中有提到 Cardano 希望未來 50 年內可像 TCP/IP 協定的存在，並與發展中國家金融體系並行運作，可能會仿照消耗 XRP 的方式消耗 ADA（目前暫無相關文件），從外部逐漸去改善財經體系，所以不同於 Ripple 由內而外去作轉變（Ripple 是為取代銀行間交易協定而生）。
+
+.image ./images/i20180809/LSE.jpg 214 225
+
+參考：[[https://www.facebook.com/groups/ada.tw/permalink/2038505419730576/][與 Charles 的訪談內容]]、[[https://zhuanlan.zhihu.com/p/34264409?group_id=954310096117776384][ADA 的非洲和發展中國家計畫]]
+
+# --------------------------------------------------
+
+* Cardano 目前仍積極被推廣至各國（2／3）
+
+- 最終，Cardano 將會解決未開發、開發中國家加密資產的轉移議題，讓無法擁有信用額度、銀行帳戶的人民，透過 ADA 的交換足以證明自己的資產，擺脫中心化管制，從而可達到金融上的自由。
+
+- 在已開發國家中，Cardano 將更專注在技術開發上的傳播，訓練人才，提供各大企業開發區塊鏈應用的解決方案。
+
+.image ./images/i20180809/MoneyMischief.jpg 350 350
+
+# --------------------------------------------------
+
+* Cardano 目前仍積極被推廣至各國（3／3）
+
+- 2017/9 時，[[http://blockcast.it/2018/04/06/foxconn-to-manufacture-blockchain-phone-from-sirin-labs/][以色列]]的新創公司 Sirin Labs 將請鴻海子公司富智康生產支援 Cardano 等區塊鏈網路的手機 Finney。使用者除了可設置簡易密碼外，亦可透過如：虹膜掃瞄、指紋辨識等技術來管理錢包地址及私鑰。而 Finney 預計於 2018/10 出貨。
+
+- 2018/5 時，[[http://pocketcoin.tw/cardano%E7%94%A8%E5%8D%80%E5%A1%8A%E9%8F%88%E6%8A%80%E8%A1%93%E5%B9%AB%E8%A1%A3%E7%B4%A2%E6%AF%94%E4%BA%9E%E7%94%9F%E7%94%A2%E5%92%96%E5%95%A1%EF%BC%81][衣索比亞]]科技部宣佈與 Cardano 合作，透過區塊鏈技術，解決發展國家的命脈產業 - 農業的問題，如：追蹤咖啡豆、土地權／使用權登記、解決土地糾紛、外資挹注等。另外 Cardano 也會培訓第一批當地以女性為主的智能合約開發團隊。
+
+.image ./images/i20180809/CardanoNews.png 285 700
+
+# --------------------------------------------------
+
+* 如何購買 Cardano ADA（1／2）
+
+- 要注意只能至[[https://www.cardano.org/en/buy-sell-ada/][官方有列表的交易所]]來進行買賣。
+- 要注意若到非官方認可的交易所購買，是極有可能無法成功將 ADA 提領出來的。
+
+.image ./images/i20180809/BuySellAda.png 441 650
+
+# --------------------------------------------------
+
+* 如何購買 Cardano ADA（2／2）
+
+- 我的方法是先在台灣的交易所（如：[[https://max.maicoin.com/][MAX]]、[[https://www.bitpoint-tw.com/][BitPoint]] 等）用台幣買 BTC、ETH。
+- 接著再將 BTC、ETH 提領至官方列表的交易所（如：[[https://www.binance.com/tw][Binance]] 等）來換取 ADA。
+- 最後把換得的 ADA 轉出至官方開發的 [[https://daedaluswallet.io/#download][Daedalus]] 個人錢包。
+
+.image ./images/i20180809/Exchanges.png 413 1000
+
+# --------------------------------------------------
+
+* Daedalus 錢包
+
+- 目前只有全節點錢包（[[https://daedaluswallet.io/#download][下載點]]），安裝後會先同步所有區塊，此時需耐心等待（12 至 36 小時）。同步後才能進行後續操作。
+
+- 新增錢包帳戶會要求記下 12 組英文助憶詞，一組帳戶可新增多組錢包位址。
+
+- 使用者可自行選擇[[https://cardanodocs.com/cardano/transaction-assurance/cn/][交易確認等級]]（Normal 或 Strict）來防範[[https://zh.wikipedia.org/wiki/%E9%9B%99%E9%87%8D%E6%94%AF%E4%BB%98][雙重支付]]攻擊。
+
+- Daedalus 預設安裝位置：C:\Program Files\Daedalus
+
+- 區塊同步位置：%USERPROFILE%\AppData\Roaming\Daedalus
+
+- 註：Cardano 錢包／交易查詢網址：[[https://cardanoexplorer.com/][https://cardanoexplorer.com/]]
+
+.image ./images/i20180809/VM_Daedalus.png 197 350
+
+# --------------------------------------------------
+
+* Cardano ADA 臺灣研究社創社緣由
+
+# --------------------------------------------------
+
+* About us
+
+.image ./images/i20180809/PersonNew.png 271 875
+#.image ./images/i20180809/Person.png 262 670
+
+- 一月初從平常的 FB 和大學同學聯絡感情中得知有人從投資加密貨幣中獲利不少。
+
+- 而大家在看了[[https://zhuanlan.zhihu.com/p/32534900][這一篇]]對 Cardano 及 Telegram 中文群的簡介後，覺得項目不錯就入坑了；
+
+- 而我則提議：「既然都投資了，不如就集結同學間實力，來研究並開設[[http://ada-pool.online/][臺灣 ADA 礦池]]，如何？」
+
+- 於是就創立現在以資訊交流為前題的 [[https://www.facebook.com/groups/ada.tw/][Cardano ADA 臺灣研究社]] Facebook 社團。
+
+# --------------------------------------------------
+
+* 附錄：線上學習資源
+
+# --------------------------------------------------
+
+* Cardano 官方／非官方資源（1／2）（★：常用）
+
+- [[https://cardanodocs.com/introduction/cn/][★ Cardano 結算層使用手冊]]
+
+- [[https://cardanoroadmap.com/][★ Cardano 開發進度]]
+
+- [[https://cardanoprojects.com/cn/][★ Cardano Projects 和 Cardano 有相關的專案、新創]]
+
+- [[https://cardanowiki.info/wiki/Home][★ 歡迎來到卡爾達諾維基首頁：國外整理的 Excel]]
+
+- [[https://t.me/CardanoHodlers][★ Telegram - Cardano Hodlers]]
+
+- [[https://cardanoexplorer.com/][★ ADA 錢包查詢器]]
+
+- [[https://www.cardanohub.org/zh/home-3/][Cardano 官網]]
+
+- [[https://iohk.io/][IOHK 公司官網]]
+
+- [[https://cardanofoundation.org/][Cardano Foundation 社區官網]]
+
+- [[https://whycardano.com/cn/][Cardano 介紹]]
+
+- [[https://cardanoupdates.com/][Cardano 程式碼提交一覽表]]
+
+# --------------------------------------------------
+
+* Cardano 官方／非官方資源（2／2）
+
+- [[https://www.cardanohub.org/en/academic-papers/][Cardano 論文下載]]
+
+- [[https://help.cardano.org/%E4%B8%AD%E6%96%87][Cardano 幫助中心]]
+
+- [[https://chat.cardano.org/][Cardano 聊天室]]
+
+- [[https://discord.gg/4pta6ZH][Cardano Discord 聊天室]]
+
+- [[https://www.meetup.com/Taipei-Cardano-meet-up/][Cardano Blockchain Taipei]]
+
+- [[https://twitter.com/iohk_charles][Twitter - Charles Hoskinson]]
+
+- [[https://twitter.com/InputOutputHK][Twitter - Input Output]]
+
+- [[https://twitter.com/cardanostiftung][Twitter - Cardano Foundation]]
+
+- [[https://twitter.com/emurgo_io][Twitter - Emurgo]]
+
+- [[https://adatracker.com/richest][ADA 錢包持有者追蹤器]]
+
+- [[http://ada-calc.herokuapp.com/][ADA 利息計算機]]
+
+# --------------------------------------------------
+
+* Cardano 中文新聞發佈平台
+
+- [[https://zhuanlan.zhihu.com/cardano][★ 知乎 - 收集关于 Cardano(ADA) 的优质文章和资讯]]
+
+- [[http://yi-programmer.com/][★ 精確編程]]
+
+- [[https://m.weibo.cn/u/6512640194?uid=6512640194&luicode=20000061&lfid=4233446609816965&featurecode=newtitle][★ 微博 - Cardano]]
+
+- [[https://m.weibo.cn/u/6524505292?uid=6524505292&featurecode=newtitle][★ 微博 - 今天 ADA 歸零了嗎]]
+
+- [[https://www.zhihu.com/topic/20139059/newest][知乎 - Cardano]]
+
+- [[https://zhuanlan.zhihu.com/ChangeTheWorld][知乎 - 用代碼改變世界]]
+
+# --------------------------------------------------
+
+* 區塊鏈中文電子書資源
+
+- [[http://static.runoob.com/download/blockchain.pdf][《區塊鏈行業詞典》]] ★ 入門區塊鏈最快的字典
+
+- [[https://img.jinse.com/831054.pdf][《2018 全球區塊鏈產業全景與趨勢報告》]] 火幣區塊鏈研究院 2018 上半年趨勢報告
+
+- [[https://www.idcbest.com/newsadmin/upFile/2018-5/%E5%8C%BA%E5%9D%97%E9%93%BE%E9%87%91%E8%9E%8D%E5%BA%94%E7%94%A8%E7%99%BD%E7%9A%AE%E4%B9%A6-%E4%BA%AC%E4%B8%9C.pdf][《區塊鏈金融應用白皮書》]] 區塊鏈應用發想
+
+- [[https://img.jinse.com/738045.pdf][《區塊鏈基礎理論與研究概況》]] 區塊鏈演算法入門
+
+# --------------------------------------------------
+
+* Haskell、Plutus 語言學習資源
+
+- [[https://legacy.gitbook.com/book/mno2/learnyouahaskell-zh/details/zh-cn][Haskell 趣學指南]] ★ 通俗易懂，生動幽默
+
+- [[https://legacy.gitbook.com/book/mno2/learnyouahaskell-zh/details/zh-cn][良葛格學習筆記]] ★ Haskell 專欄文章
+
+- [[https://cardanodocs.com/technical/plutus/introduction/cn/][PLUTUS 介紹]] 官方 Plutus 文件
+
+- （英文）[[https://youtu.be/IqA-mI2olFA][「Research; Prof. Philip Wadler, Smart Contracts.」]] Plutus 介紹影片
+
+- （英文）[[https://youtu.be/VZcKQFMEeVY][「Cardano Smart Contracts & VMs Explained」]] Cardano 虛擬機介紹影片
+
+# --------------------------------------------------
+
+* 其他區塊鏈推薦好康
+
+- [[https://sites.google.com/site/smartcontract2b/][台大資工所課程：區塊鏈與數據分析（第一學期）]] 
+
+- [[https://sites.google.com/site/2b20181h/][台大資工所課程：區塊鏈與數據分析（第二學期）]]
+
+- [[https://www.youtube.com/channel/UCWcgX3JEIAT0EElHM1xF2kA/videos][希多 - 各種加密貨幣深入介紹]]
+
+- [[https://www.blocktempo.com/][BlockTempo 動區動趨]]
+
+- [[https://www.timetocoin.com/][Time to Coin]]
+
+- [[http://blockcast.it/][區塊客]]
+
+- [[https://medium.com/@cryptoroosevelt][加密羅斯福]]
+
+- [[http://blockchainsdaily.com/][區塊鏈報]]
+
+- [[https://rocket.cafe/talks/author/astro-hsu][Rocket Café 火箭科技評論| 有態度的科技觀點與分析]]
+
+- [[https://steemit.com/trending/cn-cryptocurrency][中文區加密貨幣研究社]]
+
+- [[https://www.weibo.com/chenzhenxiang?refer_flag=1005055013_][數字資產的那點事]]
+
+# --------------------------------------------------
+
+* 加密貨幣走勢查看（1／2）
+
+- [[https://coinmarketcap.com/][Coinmarketcap - 最多人使用的加密貨幣走勢網站]]
+
+- [[https://www.coingecko.com/][CoinGecko - 有提供交易所買賣分佈統計]]
+
+- [[https://coincheckup.com/][CoinCheckup - 分析各加密貨幣營運狀況、歷史數據統計]]
+
+- [[https://rency.com/][Racy - 綜合評比網坫]]
+
+- [[https://bitinfocharts.com/][Bitinfocharts - 加密貨幣素質比較]]
+
+- [[https://coinlib.io/][Coinlib - 有統計不同加密貨幣的社群網站跟隨數]]
+
+- [[https://cryptomiso.com/][Crypto commits - 查看過去一年內加密貨幣程式提交數比較]]
+
+- [[https://arewedecentralizedyet.com/][AreWeDecentralizedYet - 查看加密貨幣網路去中心化程度]]
+
+# --------------------------------------------------
+
+* 加密貨幣走勢查看（2／2）
+
+- [[https://coinloop.io/][CoinLoop - 用 AI 預測加密貨幣走勢]]
+
+- [[https://walletinvestor.com/forecast][WalletInvestor - 有提供加密貨幣未來五年內預測]]
+
+- [[https://onchainfx.com/][Onchainfx - 預測 2050 年加密貨幣市場總值]]
+
+- [[http://alexa.chinaz.com/iohk.io][查看 IOHK 官網流量]]
+
+- [[http://alexa.chinaz.com/cardano.org][查看 Cardano 官網流量]]
+
+- [[https://coinmetrics.io/][CoinMetrics - 有提供加密貨幣歷史 CSV 檔下載]]
+
+- [[https://tw.tradingview.com/][TradingView - 可以在加密貨幣走勢圖上作畫]]
+
+# --------------------------------------------------
+
+* 特別感謝
+
+# --------------------------------------------------
+
+* 本投影片製作特別感謝：
+
+- Ben 子軒大：[[https://www.okex.com/][OKEx 交易所]]
+
+- Polo 相安大：[[https://www.facebook.com/readbook999/][線上讀書會]]、[[https://www.facebook.com/groups/761794320669468/][區塊鏈 blockchain 線上讀書會]]
+
+- Paul 思翰大：[[https://www.facebook.com/groups/897485720426082/][IOTA 愛好者中文社群]]
+
+- Jeremy 傑龍馮：[[https://www.facebook.com/AsiaBlockcamp/][Blockcamp 區塊邦]]
+
+- Jasin Yip 葉俊星：[[https://t.me/CardanoHodlers][Cardano Hodlers - Cardano 中文 Telegram 社群]]
+
+- Alicia、Nicholas、Murapon：[[https://emurgo.io/home-zh/][Emurgo.io]]
+
+- 陳望博老師：[[https://www.facebook.com/groups/350519248691476/][惣子社團]]
+
+- 廖世偉老師、謝銘峰博士生：[[https://fintech.csie.ntu.edu.tw/][臺大金融科技區塊鏈]]
+
+- 張凱捷：加密殭屍以太坊程式教學 100% 無痛全破分享會 [[https://youtu.be/qOGCvYLQ86k][Part 01]]、[[https://youtu.be/gUCMHlfXe4I][Part 02]]、[[https://youtu.be/wRqsd99S12c][Part 03]]
+
+- 子鈞大、介良大、及所有動區動趨媒體夥伴：[[https://www.facebook.com/BlockTempo/][動區動趨 BlockTempo - 由社群而生的區塊鏈媒體]]
+
+# --------------------------------------------------
+
+* 介紹完畢，感謝各位！
+
+.image ./images/i20180809/AdaWorld.jpg 500 459
+
+# --------------------------------------------------
