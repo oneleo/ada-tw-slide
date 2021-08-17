@@ -13,14 +13,19 @@ https://github.com/oneleo
 
 // --------------------------------------------------
 
-## 在 VM 虛擬機內安裝 testnet 礦池
+## 準備虛擬環境
 - 確認自己有 VMware Workstation Pro 16 虛擬機軟體 Key 後，至 [VMware 官網](https://www.vmware.com/products/workstation-pro/workstation-pro-evaluation.html)下載  
 
 .image ./images/i20210831/i20210831.01-workstation.png _ 750
 
+: 補充：若沒有 License Key 的話，可以 Google 關鍵字，說不定會有所收獲。
+
 // --------------------------------------------------
 
+## 準備虛擬環境
+- 至 [Ubuntu 官網](https://ubuntu.com/download/desktop) 下載 LTS 長期支援版 iso 映象檔
 
+.image ./images/i20210831/i20210831.02-ubuntu.png _ 750
 
 // --------------------------------------------------
 
