@@ -1,0 +1,193 @@
+# 在 VM 虛擬機建置 Cardano 主網礦池
+Cardano 區塊鏈測試鏈
+19:30 28 Mar 2020
+Tags: golang, go, cht
+Summary: This is a great document you want to read.
+OldURL: former-path-for-this-doc
+
+陳敬翔
+資訊學系培訓師, 中華電信學院
+oneleo@cht.com.tw
+https://github.com/oneleo
+@oneleo760823
+
+
+// --------------------------------------------------
+
+## 起源
+
+- 有鑑於最近 ADA 幣[價格上漲][1]
+- 且可用於建置 [Cardano 礦池的容器][2]在 2021/08/24 有更新
+- 所以讓我們跟隨 [Cardano 官方文件][3]學習，在 VM 虛擬機中建置自己的礦池吧！
+- 註：本簡報按下鍵盤「N」鍵可觀看註解
+- 註：根據 [Cardano 官方建置礦池的守則][4]中提及，若要建置用於可提供服務的礦池，需確定自己符合以下幾點規範：
+	- 具備建置、執行、維護 Cardano 節點的能力
+	- 可保證 Cardano 節點可連續每天 24 小時 x 每週 7 天 x 每年 365 天不間斷提供服務
+	- 具備服務提供系統的操作能力
+	- 具備伺服器管理（操作和維護）能力
+	- 若具備軟體開發和維運（DevOps）經驗將會非常有幫助
+	- 伺服器至少具備 1 組固定的 IPv4 IP、1Gb 網路頻寬、8 GB RAM、24 GB 磁碟空間
+
+[1]: https://www.blocktempo.com/ada-break-ath-after-announcing-the-new-upgrade "兩週暴漲 180%，ADA 再創新高 2.5 鎂！Cardano 9 月將引進智能合約發展 DeFi"
+[2]: https://hub.docker.com/r/inputoutput/cardano-node "cardano-node"
+[3]: https://docs.cardano.org/getting-started/installing-the-cardano-node "Installing the Cardano node"
+[4]: https://docs.cardano.org/getting-started/operating-a-stake-pool/creating-a-stake-pool "Creating a stake pool"
+
+// --------------------------------------------------
+
+## 準備虛擬環境
+
+- 至 [Ubuntu 官網][1] 下載 LTS 長期支援版 iso 映象檔
+
+[1]: https://ubuntu.com/download/desktop "Ubuntu desktop"
+
+.image ./images/i20210831/i20210831.02-ubuntu.png _ 750
+
+// --------------------------------------------------
+
+## 準備虛擬環境
+
+- 確認自己有 VMware Workstation Pro 16 虛擬機軟體 Key 後，至 [VMware 官網](https://www.vmware.com/products/workstation-pro/workstation-pro-evaluation.html)下載  
+
+.image ./images/i20210831/i20210831.01-workstation.png _ 750
+
+: 補充：若沒有 License Key 的話，可以 Google 關鍵字，說不定會有所收獲。
+
+// --------------------------------------------------
+
+## 準備虛擬環境
+
+- 建置新的 Virtual Machine
+
+.image ./images/i20210831/i20210831.03-newvm.png _ 750
+
+// --------------------------------------------------
+
+## 為避免本簡報過於冗長，這邊只提示幾個建置 VM 的參數
+
+- 伺服器至少要有 8 GB 的 RAM，所以這裡 VM 設定相同資源
+
+.image ./images/i20210831/i20210831.04-ram.png _ 500
+
+// --------------------------------------------------
+
+## 為避免本簡報過於冗長，這邊只提示幾個建置 VM 的參數
+
+- 伺服器需具備 1 組固定的 IPv4 IP，所以 VM 網路使用 bridge 模式（與 Host 母體同一網段）以貼近實際情形
+
+.image ./images/i20210831/i20210831.05-network.png _ 500
+
+// --------------------------------------------------
+
+## 為避免本簡報過於冗長，這邊只提示幾個建置 VM 的參數
+
+- 為貼近真實建置伺服器之情形，所以增加存放 Cardano 資料的磁碟（至少 24 GB）
+
+.image ./images/i20210831/i20210831.06-datadisk.png _ 750
+
+// --------------------------------------------------
+
+## Ubuntu Desktop 安裝完成後先進行更新及必要軟體安裝
+
+- 先使用「Software Update」進行系統更新
+
+.image ./images/i20210831/i20210831.07-update.png _ 950
+
+// --------------------------------------------------
+
+## Ubuntu Desktop 安裝完成後先進行更新及必要軟體安裝
+
+- 再開啟「Terminal」終端機，以使用指令完成必要軟體安裝
+
+.image ./images/i20210831/i20210831.08-terminal.png _ 950
+
+// --------------------------------------------------
+
+## Ubuntu Desktop 安裝完成後先進行更新及必要軟體安裝
+
+1. 更新套件資料庫及進行作業系統相依性更新（指令不包含「$」符號）
+
+	```bash
+	$ sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade
+	```
+
+2. 安裝 VM 虛擬機的驅動程式
+
+	```bash
+	$ sudo apt-get -y install open-vm-tools-desktop
+	```
+
+3. 重新開機讓驅動程式生效（接著可將指令用熱鍵「Ctrl + Shift + V」貼入 VM）
+
+	```bash
+	$ sudo sync && sudo reboot
+	```
+
+4. 再次開啟「Terminal」終端機，安裝 SSH 遠端工具、ufw 簡易防火牆設定工具、vim 文字編輯工具、curl 抓取工具、xfsprogs 磁碟格式化工具、util-linux 通用工具
+
+	```bash
+	$ sudo apt-get -y install ssh ufw vim net-tools curl xfsprogs util-linux podman
+	```
+
+5. 安裝具 Daemonless、Rootless 特色的 [Podman 容器引擎][1]（指令超出部份請觀看此連結）
+
+	```bash
+	$ . /etc/os-release
+	$ echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+	$ curl -L "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key" | sudo apt-key add -
+	$ sudo apt-get update
+	$ sudo apt-get -y upgrade
+	$ sudo apt-get -y install podman
+	```
+
+[1]: https://podman.io/getting-started/installation#ubuntu "Podman"
+
+// --------------------------------------------------
+
+## 將第二顆磁碟格式化成 xfs 檔案系統以用於儲存 Cardano 節點資料
+
+1. 可視自己需要格式化所需的[檔案系統][1]
+2. 找到這顆磁碟（這裡以格式化 sdb 磁碟為例）
+
+	```bash
+	$ lsblk -o NAME,HCTL,SIZE,MOUNTPOINT | grep -i "sd"
+	```
+[1]: https://zh.wikipedia.org/wiki/文件系统的对比 "File System"
+
+.image ./images/i20210831/i20210831.09-lsblk.png _ 750
+
+// --------------------------------------------------
+
+## 將第二顆磁碟格式化成 xfs 檔案系統以用於儲存 Cardano 節點資料
+
+3. 將 sdb 磁碟格式化成 xfs 檔案系統 
+
+	```bash
+	$ sudo parted /dev/sdb --script mklabel gpt mkpart xfspart xfs 0% 100%
+	$ sudo mkfs.xfs /dev/sdb1
+	$ sudo partprobe /dev/sdb1
+	```
+
+// --------------------------------------------------
+
+
+// --------------------------------------------------
+
+
+// --------------------------------------------------
+
+
+// --------------------------------------------------
+
+
+## 格式化第二顆磁碟用於儲存 Cardano 節點資料
+
+1. 下載 cardano-node Container Image
+
+	```bash
+
+	```
+
+
+
+// --------------------------------------------------

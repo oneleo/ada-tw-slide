@@ -11,6 +11,7 @@ Cardano ADA 臺灣研究社
 ## 建置 Cardano 礦池相關原創文章
 
 1. [2018/08/09 Cardano 區塊鏈的基本介紹](https://go-talks.appspot.com/github.com/oneleo/ada-tw-slide/s20180809-intro.slide)
+2. [2021/08 在 VM 虛擬機建置 Cardano 主網礦池](https://go-talks.appspot.com/github.com/oneleo/ada-tw-slide/s202108-mainnet_in_vm.slide)
 
 ## 要如何保存並在本機瀏覽這裡的簡報？
 - 這裡的簡報均是用 Go 語言的 [present](https://pkg.go.dev/golang.org/x/tools/present) 專案製作，以下在 Windows 作業系統中編譯
