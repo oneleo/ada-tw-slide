@@ -123,10 +123,10 @@ https://github.com/oneleo
 	$ sudo sync && sudo reboot
 	```
 
-4. 再次開啟「Terminal」終端機，安裝 SSH 遠端工具、ufw 簡易防火牆設定工具、vim 文字編輯工具、curl 抓取工具、xfsprogs 磁碟格式化工具、util-linux 通用工具
+4. 再次開啟「Terminal」終端機，安裝 SSH 遠端工具、ufw 簡易防火牆設定工具、nano 文字編輯工具、curl 抓取工具、xfsprogs 磁碟格式化工具、util-linux 通用工具
 
 	```bash
-	$ sudo apt-get -y install ssh ufw vim net-tools curl xfsprogs util-linux podman
+	$ sudo apt-get -y install ssh ufw nano net-tools curl xfsprogs util-linux podman
 	```
 
 5. 安裝具 Daemonless、Rootless 特色的 [Podman 容器引擎][1]（指令超出部份請觀看此連結）
@@ -146,13 +146,16 @@ https://github.com/oneleo
 
 ## 將第二顆磁碟格式化成 xfs 檔案系統以用於儲存 Cardano 節點資料
 
-1. 可視自己需要格式化所需的[檔案系統][1]
+1. 可視自身需要格式化所需的[檔案系統][1]，格式化 xfs 細節可參考[此網站][2]
 2. 找到這顆磁碟（這裡以格式化 sdb 磁碟為例）
 
 	```bash
 	$ lsblk -o NAME,HCTL,SIZE,MOUNTPOINT | grep -i "sd"
 	```
+
 [1]: https://zh.wikipedia.org/wiki/文件系统的对比 "File System"
+[2]: https://docs.microsoft.com/zh-tw/azure/virtual-machines/linux/attach-disk-portal "使用入口網站將資料磁碟附加至 Linux VM"
+
 
 .image ./images/i20210831/i20210831.09-lsblk.png _ 750
 
@@ -160,7 +163,7 @@ https://github.com/oneleo
 
 ## 將第二顆磁碟格式化成 xfs 檔案系統以用於儲存 Cardano 節點資料
 
-3. 將 sdb 磁碟格式化成 xfs 檔案系統 
+3. 將整個 sdb 進行磁碟分割及格式化成 xfs 檔案系統
 
 	```bash
 	$ sudo parted /dev/sdb --script mklabel gpt mkpart xfspart xfs 0% 100%
@@ -168,26 +171,108 @@ https://github.com/oneleo
 	$ sudo partprobe /dev/sdb1
 	```
 
-// --------------------------------------------------
-
-
-// --------------------------------------------------
-
-
-// --------------------------------------------------
-
-
-// --------------------------------------------------
-
-
-## 格式化第二顆磁碟用於儲存 Cardano 節點資料
-
-1. 下載 cardano-node Container Image
+4. 再次查看磁碟列表，可以看到磁碟 sdb1 已順利格式化完成
 
 	```bash
-
+	$ lsblk -o NAME,HCTL,SIZE,MOUNTPOINT | grep -i "sd"
 	```
 
+.image ./images/i20210831/i20210831.10-sdb1.png _ 500
+
+// --------------------------------------------------
+
+## 將第二顆磁碟格式化成 xfs 檔案系統以用於儲存 Cardano 節點資料
+
+5. 將 sdb1 磁碟掛載至 /datadrive（位置可視自身情況調整）
+
+	```bash
+	$ sudo mkdir -p /datadrive
+	$ sudo mount /dev/sdb1 /datadrive
+	```
+
+6. 設置開機時自動掛載指定 UUID 的磁碟（這邊以自動掛載 /dev/sdb1 為例，並記下專屬於自身情況之 UUID 值）
+
+	```bash
+	$ sudo blkid
+	```
+
+.image ./images/i20210831/i20210831.11-sdb1uuid.png _ 1000
+
+// --------------------------------------------------
+
+## 將第二顆磁碟格式化成 xfs 檔案系統以用於儲存 Cardano 節點資料
+
+7. 修改開機時自動掛載磁碟列表
+
+	```bash
+	$ sudo nano /etc/fstab
+	```
+
+8. 在 /etc/fstab 最下方新增 2 列（再使用熱鍵「Ctrl + O」+「Enter」存檔→「Ctrl + X」關閉）
+
+	```
+	# /datadrive was on /dev/sdb1 during installation
+	UUID=a758e667-6c09-4b13-9471-187d71a313b4	/datadrive	xfs	defaults,nofail	1	2
+	```
+
+.image ./images/i20210831/i20210831.12-fstab.png _ 1000
+
+// --------------------------------------------------
+
+## 開始建置 Cardano 節點
+
+1. 建立 Cardano 節點會用到的目錄，並更改存取權限
+
+	```bash
+	$ sudo mkdir -p /datadrive/cardano-node-data
+	$ sudo mkdir -p /datadrive/cardano-node-ipc
+	$ sudo chown -R "$USER":"$USER" /datadrive/*
+	$ sudo chmod -R 755 /datadrive/*
+	```
+2. 下載 cardano-node Container Image
+
+	```bash
+	$ podman pull docker.io/inputoutput/cardano-node:latest
+	```
+
+3. 啟動 cardano-node Container
+
+	```bash
+	$ podman run -d --restart=always -it -e NETWORK=mainnet -e CARDANO_NODE_SOCKET_PATH=/ipc/node.socket \
+	-p 3001:3001 --name cardano-node -v /datadrive/cardano-node-ipc:/ipc \
+	-v /datadrive/cardano-node-data:/data docker.io/inputoutput/cardano-node:latest
+	```
+
+4. 下載官方編譯好的 cardano-node 可執行檔至容器 /bin 目錄內（容器內只有 cardano-cli 可執行檔）
+
+	```bash
+	$ cd /tmp
+	$ wget -N https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished/download -P /tmp
+	$ mv /tmp/download /tmp/cardano-node.tar.gz
+	$ tar -zxv -f "/tmp/cardano-node.tar.gz" -C "/tmp"
+	//$ podman cp /tmp/cardano-node cardano-node:/cardano-node
+	```
+
+// --------------------------------------------------
+
+## 開始建置 Cardano 節點
+
+
+4. 查看容器內的 cardano-node 及 cardano-cli 版本
+
+	```bash
+	$ podman exec -it cardano-node cardano-node version
+	$ podman exec -it cardano-node cardano-cli version
+	```
+
+// --------------------------------------------------
+
+
+
+// --------------------------------------------------
+
+
+// --------------------------------------------------
 
 
 // --------------------------------------------------
