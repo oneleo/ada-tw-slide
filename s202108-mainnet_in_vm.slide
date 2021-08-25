@@ -73,7 +73,7 @@ https://github.com/oneleo
 
 ## 為避免本簡報過於冗長，這邊只提示幾個建置 VM 的參數
 
-- 伺服器需具備 1 組固定的 IPv4 IP，所以 VM 網路使用 bridge 模式（與 Host 母體同一網段）以貼近實際情形
+- 伺服器需具備 1 組固定的 IPv4 IP，所以 VM 網路使用 bridge 模式（與 Host 宿主主機同一網段）以貼近實際情形
 
 .image ./images/i20210831/i20210831.05-network.png _ 500
 
@@ -108,7 +108,7 @@ https://github.com/oneleo
 1. 更新套件資料庫及進行作業系統相依性更新（指令不包含「$」符號）
 
 	```bash
-	$ sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade
+	$ sudo apt-get update && sudo apt-get -y dist-upgrade && sudo apt-get -y autoremove
 	```
 
 2. 安裝 VM 虛擬機的驅動程式
@@ -123,24 +123,33 @@ https://github.com/oneleo
 	$ sudo sync && sudo reboot
 	```
 
-4. 再次開啟「Terminal」終端機，安裝 SSH 遠端工具、ufw 簡易防火牆設定工具、nano 文字編輯工具、curl 抓取工具、xfsprogs 磁碟格式化工具、util-linux 通用工具
+4. 再次開啟「Terminal」終端機，安裝 SSH 遠端工具、ufw 簡易防火牆設定工具、nano 文字編輯工具、curl／wget 抓取工具、xfsprogs 磁碟格式化工具、util-linux 通用工具
 
 	```bash
-	$ sudo apt-get -y install ssh ufw nano net-tools curl xfsprogs util-linux podman
+	$ sudo apt-get -y install ssh ufw nano net-tools curl wget xfsprogs util-linux
 	```
 
-5. 安裝具 Daemonless、Rootless 特色的 [Podman 容器引擎][1]（指令超出部份請觀看此連結）
+5. 安裝具 Daemonless、Rootless 特色的 [Podman 容器引擎][1]（下面指令超出部份請觀看此連結）
 
 	```bash
 	$ . /etc/os-release
 	$ echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
 	$ curl -L "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key" | sudo apt-key add -
-	$ sudo apt-get update
-	$ sudo apt-get -y upgrade
+	$ sudo apt-get update && sudo apt-get -y upgrade
 	$ sudo apt-get -y install podman
 	```
 
 [1]: https://podman.io/getting-started/installation#ubuntu "Podman"
+
+: 補充：
+: 若使用 Ubuntu 20.10 或以上版本，安裝 podman 請直接下 `$ sudo apt-get -y install podman` 指令即可。
+
+: 指令說明：
+: 1、【sudo】：使用像是更新等操作需擁有管理者權限來進行，使用時預設需輸入密碼。
+: 【apt-get】：Ubuntu 的包裝工具，可使用此來進行更新（update）、安裝套件（install）等動作。
+: 【update】：更新套件資料庫。【upgrade】：進行更新。【dist-grade】：進行更新並將相依套件一同安裝。
+: 【-y】參數：不再詢問是否需要安裝／更新，一律為 Yes。
+: 【&&】符號：若前一個指令順利安裝完成（$? 變數為 0）則繼續執行下一個指令。
 
 // --------------------------------------------------
 
@@ -190,6 +199,10 @@ https://github.com/oneleo
 	$ sudo mount /dev/sdb1 /datadrive
 	```
 
+: 指令說明：
+: 1、【mkdir】：建立目錄。
+: 【-p /A/B/C】：遞迴建立，建立 C 目錄時，若 A 及 B 目錄不存在則一同建置。
+
 6. 設置開機時自動掛載指定 UUID 的磁碟（這邊以自動掛載 /dev/sdb1 為例，並記下專屬於自身情況之 UUID 值）
 
 	```bash
@@ -217,7 +230,48 @@ https://github.com/oneleo
 
 .image ./images/i20210831/i20210831.12-fstab.png _ 1000
 
+: 註：/etc/fstab 的 dump 與 pass 的設定：
+: a、根目錄設定成：1	1
+: b、其他設定成：1	2
+: c、暫存區設定成：0	2
+: d、網路掛載設定成：0	0
+
 // --------------------------------------------------
+
+## 設置 Host 宿主主機防火牆
+
+1. 允許 cardano-node Container 的 3001 Port 進來此 Host 宿主主機
+
+	```bash
+	$ sudo ufw allow in 3001
+	```
+
+2. 只允許指定網段的電腦透過 SSH（22 port）服務連入此 Host 宿主主機
+
+	```bash
+	$ sudo ufw allow in from 192.168.0.0/24 to any port 22
+	```
+
+3. 將防火牆設定成預設檔掉其他的進來的連線，只有上述允許的政策才能通過
+
+	```bash
+	$ sudo ufw default deny incoming
+	```
+
+4. 重新啟動防火牆，並且讓防火牆於開機時啟動
+
+	```bash
+	$ sudo ufw enable
+	```
+
+5. 設定開機時自動啟動 SSH 服務
+
+	```bash
+	$ sudo systemctl enable ssh
+	```
+
+// --------------------------------------------------
+
 
 ## 開始建置 Cardano 節點
 
@@ -238,27 +292,64 @@ https://github.com/oneleo
 3. 啟動 cardano-node Container
 
 	```bash
-	$ podman run -d --restart=always -it -e NETWORK=mainnet -e CARDANO_NODE_SOCKET_PATH=/ipc/node.socket \
-	-p 3001:3001 --name cardano-node -v /datadrive/cardano-node-ipc:/ipc \
+	$ podman run -d --restart=always -it -p 3001:3001 --name cardano-node \
+	-v /datadrive/cardano-node-ipc:/ipc \
 	-v /datadrive/cardano-node-data:/data docker.io/inputoutput/cardano-node:latest
 	```
 
-4. 下載官方編譯好的 cardano-node 可執行檔至容器 /bin 目錄內（容器內只有 cardano-cli 可執行檔）
+4. 除了 Container 內建的 cardano-cli 指令，尚需下載官方編譯好的 [cardano-node][1] 放至 Container 的 /bin 目錄內
 
 	```bash
-	$ cd /tmp
-	$ wget -N https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished/download -P /tmp
-	$ mv /tmp/download /tmp/cardano-node.tar.gz
-	$ tar -zxv -f "/tmp/cardano-node.tar.gz" -C "/tmp"
-	//$ podman cp /tmp/cardano-node cardano-node:/cardano-node
+	$ wget -N https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished/download \
+	-O /tmp/cardano-node.tar.gz
+	$ sha256sum /tmp/cardano-node.tar.gz
+	$ mkdir -p /tmp/cardano-node
+	$ tar -zxv -f "/tmp/cardano-node.tar.gz" -C "/tmp/cardano-node"
+	// https://ithelp.ithome.com.tw/articles/10238415
+	// https://www.coincashew.com/coins/overview-ada/guide-how-to-build-a-haskell-stakepool-node
+	// https://github.com/oneleo/PythonSparkMLBookClub/tree/master/Homework-PythonSparkML_08/006-CreateHadoopContainerImage
+	// https://docs.docker.com/engine/reference/run/
+	// https://docs.cardano.org/getting-started/installing-the-cardano-node
+	//$ podman cp /tmp/cardano-node/cardano-node cardano-node:/bin/cardano-node
 	```
+[1]: https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished "cardano-node-linux"
+
+: 指令說明：
+: 1、【chown】：改變目錄或檔案的擁有者及所屬群組。
+: 【-R】參數：若是改變目錄的擁有者，則連同子目錄也一同設置。
+: 【A:B】：此目錄或檔案的擁有者為 A 及所屬群組為 B。
+: 【$USER】：凡使用「$」的字串稱之為變數，$USER 表示目前的使用者，請使用 $ echo $USER 指令查看就會知道。
+: 2、【chmod】：改變目錄的存取權限。
+: 【700】：照順序對映：擁有者→所屬群組→其他人。
+: 【7】的含義：4 + 2 + 1：若允許讀取（r）則加 4，若允許寫入（w）則加 2，若允許執行（x）則加 1。
+: 舉例：「700」的含義：擁有者允許讀取、寫入、執行。所屬群組權限全被禁止。其他人權限全被禁止。
+: 舉例：「754」的含義：擁有者允許讀取、寫入、執行。所屬群組僅允許讀取、執行，但不能寫入。其他人只允許讀取。
+: 3、【podman】：執行軟體貨櫃相關指令。
+: 【pull】指令：下載指定的 Docker Image。
+: 【A:B】參數：下載 B 版本的 A Docker Image，在這邊是下載最新的（Latest）的 cardano-node 光碟片。
+: 4、【docker run】：建立新的 Container。
+: 【--restart=always】：記住 Container 目前的執行狀態（啟動或停止），Host 宿主主機重開機後此 Container 會回覆上一階段的執行狀態
+: 【--name】：設定 Container 的別名，此別名並非 Container Host Name（Container 本身不會知道此別名，只有 Host 宿主主機才看得到）。
+: 【-it】：分配 pseudo-TTY 綁在 Container 的標準輸入上，讓使用者可與之互動。
+: 【-d】=【--detach】：Container 建立後即推到背景執行。
+: 【-v】參數：volume，把 Host 宿主主機的目錄，掛到（mount）貨櫃主機程式內的 /opt 目錄上，此一行為稱之 Docker 的外掛目錄。
+: 【-e】參數：設置 Container 中的環境變數。
+: 【-p】參數：將 Host 宿主主機指定的網路埠對映到 Container 內的指定網路埠。
+: 5、【wget A】：下載檔案 A。
+: 【-O】參數：指定下載檔案的名稱。
+: 6、【tar】：解壓縮或壓縮檔案，由後面的參數來決定。
+: 【-z】參數：解壓縮或壓縮成 gzip 格式的檔案。
+: 【-x】參數：進行解壓縮作業。
+: 【-c】參數：進行壓縮作業。
+: 【-v】參數：顯示解壓縮或壓縮作業的細節。
+: 【-f A】參數：指定要解壓縮或壓縮的檔案 A 或目錄 A。
+: 【-C】參數：指定解壓縮或壓縮的目的目錄。
 
 // --------------------------------------------------
 
 ## 開始建置 Cardano 節點
 
-
-4. 查看容器內的 cardano-node 及 cardano-cli 版本
+5. 查看容器內的 cardano-node 及 cardano-cli 版本
 
 	```bash
 	$ podman exec -it cardano-node cardano-node version
