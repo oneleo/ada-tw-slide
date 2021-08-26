@@ -278,15 +278,14 @@ https://github.com/oneleo
 1. 建立 Cardano 節點會用到的目錄，並更改存取權限
 
 	```bash
-	$ sudo mkdir -p /datadrive/cardano-node-data
-	$ sudo mkdir -p /datadrive/cardano-node-ipc
-	$ sudo chown -R "$USER":"$USER" /datadrive/*
-	$ sudo chmod -R 755 /datadrive/*
+	$ sudo mkdir -p /datadrive/cardano-node-data && sudo mkdir -p /datadrive/cardano-node-ipc && sudo mkdir -p /datadrive/cardano-node-bin
+	$ sudo chown -R "$USER":"$USER" /datadrive/* && sudo chmod -R 755 /datadrive/*
 	```
 2. 下載 cardano-node Container Image
 
 	```bash
 	$ podman pull docker.io/inputoutput/cardano-node:latest
+	$ podman pull docker.io/library/ubuntu:latest
 	```
 
 3. 啟動 cardano-node Container
@@ -296,6 +295,11 @@ https://github.com/oneleo
 	-v /datadrive/cardano-node-ipc:/ipc \
 	-v /datadrive/cardano-node-data:/data docker.io/inputoutput/cardano-node:latest
 	```
+
+// --------------------------------------------------
+
+
+## 開始建置 Cardano 節點
 
 4. 除了 Container 內建的 cardano-cli 指令，尚需下載官方編譯好的 [cardano-node][1] 放至 Container 的 /bin 目錄內
 
@@ -358,7 +362,121 @@ https://github.com/oneleo
 
 // --------------------------------------------------
 
+// --------------------------------------------------
 
+## 開始建置 Cardano 節點
+
+- 下載官方已編譯好之[最新的 cardano-node 及 cardano-cli][1] 核心元件壓縮檔
+
+	```bash
+	$ wget -N https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished/download/1/cardano-node-linux.tar.gz \
+	-O /tmp/cardano-node.tar.gz
+	```
+
+- 下載後請比對檔案與[官方的 SHA-256 hash 值一致（點選右方的「detail」鈕可查看）][1]
+
+	```bash
+	$ sha256sum /tmp/cardano-node.tar.gz
+	```
+
+- 解壓縮
+
+	```bash
+	$ tar -zxv -f "/tmp/cardano-node.tar.gz" -C "/datadrive/cardano-node-bin"
+	```
+
+
+// --------------------------------------------------
+
+## 開始建置 Cardano 節點
+
+- 建立
+
+```bash
+$ podman run -d -it --name cardano --entrypoint bash \
+-v /datadrive/cardano-node-ipc:/ipc \
+-v /datadrive/cardano-node-data:/data \
+docker.io/inputoutput/cardano-node:latest
+
+$ podman run -d -it --name ubuntu  \
+-v /datadrive/cardano-node-ipc:/ipc \
+-v /datadrive/cardano-node-data:/data \
+docker.io/library/ubuntu:latest
+
+$ podman ps -a
+```
+
+- 進入
+
+```bash
+$ podman exec -it cardano bash
+$ podman exec -it ubuntu bash
+```
+
+- 把 Container 作為系統服務
+- https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/porting-containers-to-systemd-using-podman_building-running-and-managing-containers
+- https://www.tutorialworks.com/podman-systemd/
+
+// --------------------------------------------------
+
+## 開始建置 Cardano 節點
+
+
+- 複製
+
+```bash
+mkdir -p /tmp/cardano-node-container
+podman cp cardano:/bin /tmp/cardano-node-container/
+podman cp cardano:/data /tmp/cardano-node-container/
+podman cp cardano:/dev /tmp/cardano-node-container/
+podman cp cardano:/etc /tmp/cardano-node-container/
+podman cp cardano:/ipc /tmp/cardano-node-container/
+podman cp cardano:/lib /tmp/cardano-node-container/
+podman cp cardano:/libexec /tmp/cardano-node-container/
+podman cp cardano:/nix /tmp/cardano-node-container/
+podman cp cardano:/nix-support /tmp/cardano-node-container/
+podman cp cardano:/proc /tmp/cardano-node-container/
+podman cp cardano:/run /tmp/cardano-node-container/
+podman cp cardano:/sbin /tmp/cardano-node-container/
+podman cp cardano:/share /tmp/cardano-node-container/
+podman cp cardano:/sys /tmp/cardano-node-container/
+podman cp cardano:/tmp /tmp/cardano-node-container/
+
+find /tmp/cardano-node-container -name *.json
+
+```
+
+- 刪除
+
+```bash
+$ podman rm -f -v cardano ubuntu
+```
+
+- 建立 Dockerfile
+
+```bash
+$ echo 'FROM docker.io/library/ubuntu:latest
+ARG NODE_CONFIG
+RUN apt-get update && apt-get -y upgrade && apt-get -y dist-upgrade && apt-get -y install wget tar && \
+	mkdir -p "/opt/db/socket" "/opt/configuration" && \
+	wget -N "https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished/download/1/cardano-node-linux.tar.gz" -O "/tmp/cardano-node.tar.gz" && \
+	wget -N "https://hydra.iohk.io/job/Cardano/iohk-nix/cardano-deployment/latest-finished/download/1/${NODE_CONFIG:-mainnet}-config.json" -P "/opt/configuration/" && \
+	wget -N "https://hydra.iohk.io/job/Cardano/iohk-nix/cardano-deployment/latest-finished/download/1/${NODE_CONFIG:-mainnet}-byron-genesis.json" -P "/opt/configuration/" && \
+	wget -N "https://hydra.iohk.io/job/Cardano/iohk-nix/cardano-deployment/latest-finished/download/1/${NODE_CONFIG:-mainnet}-shelley-genesis.json" -P "/opt/configuration/" && \
+	wget -N "https://hydra.iohk.io/job/Cardano/iohk-nix/cardano-deployment/latest-finished/download/1/${NODE_CONFIG:-mainnet}-topology.json" -P "/opt/configuration/" && \
+    tar -zxv -f "/tmp/cardano-node.tar.gz" -C "/usr/local/bin" && \
+	mv -f "/usr/local/bin/configuration" "/opt/" && \
+    rm -rf "/tmp/cardano-node.tar.gz"'> Dockerfile
+
+podman cp /tmp/cardano-node/cardano-node test:/usr/local/bin/cardano-node
+podman cp /tmp/cardano-node/cardano-cli test:/usr/local/bin/cardano-cli
+
+
+```
+
+
+
+[1]: https://hydra.iohk.io/job/Cardano/cardano-node/cardano-node-linux/latest-finished "cardano-node-linux"
 
 // --------------------------------------------------
 
