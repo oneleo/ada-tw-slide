@@ -284,6 +284,8 @@ https://github.com/oneleo
 2. 下載 cardano-node Container Image
 
 	```bash
+	$ podman pull docker.io/library/debian:stable-slim
+	
 	$ podman pull docker.io/inputoutput/cardano-node:latest
 	$ podman pull docker.io/library/ubuntu:latest
 	$ podman pull docker.io/arradev/cardano-node:latest
