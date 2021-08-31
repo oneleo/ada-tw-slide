@@ -286,6 +286,12 @@ https://github.com/oneleo
 	```bash
 	$ podman pull docker.io/inputoutput/cardano-node:latest
 	$ podman pull docker.io/library/ubuntu:latest
+	$ podman pull docker.io/arradev/cardano-node:latest
+	$ podman history --no-trunc docker.io/arradev/cardano-node:latest
+	$ podman pull docker.io/library/debian:stable-20210408-slim
+	$ podman history --no-trunc docker.io/library/debian:stable-20210408-slim
+
+
 	```
 
 3. 啟動 cardano-node Container
