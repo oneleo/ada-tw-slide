@@ -488,6 +488,19 @@ podman cp /tmp/cardano-node/cardano-cli test:/usr/local/bin/cardano-cli
 
 // --------------------------------------------------
 
+// --------------------------------------------------
+
+## 開始建置 Cardano 節點
+
+
+- 上傳
+
+```bash
+$ podman tag localhost/cardano-pool:latest oneleo/cardano-pool:latest
+$ podman tag localhost/cardano-pool:0.0.1 oneleo/cardano-pool:0.0.1
+$ podman login docker.io
+$ podman push docker.io/oneleo/cardano-pool:0.0.1
+```
 
 // --------------------------------------------------
 
