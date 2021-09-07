@@ -496,10 +496,12 @@ podman cp /tmp/cardano-node/cardano-cli test:/usr/local/bin/cardano-cli
 - 上傳
 
 ```bash
-$ podman tag localhost/cardano-pool:latest oneleo/cardano-pool:latest
-$ podman tag localhost/cardano-pool:0.0.1 oneleo/cardano-pool:0.0.1
+$ podman tag localhost/cardano-pool:latest docker.io/oneleo/cardano-pool:latest
+$ podman tag localhost/cardano-pool:0.0.1 docker.io/oneleo/cardano-pool:0.0.1
 $ podman login docker.io
 $ podman push docker.io/oneleo/cardano-pool:0.0.1
+$ podman push docker.io/oneleo/cardano-pool:latest
+$ podman run --rm -it  docker.io/oneleo/cardano-pool:latest ls -al /opt
 ```
 
 // --------------------------------------------------
